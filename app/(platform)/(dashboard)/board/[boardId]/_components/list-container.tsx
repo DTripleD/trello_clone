@@ -29,8 +29,17 @@ export const ListContainer = ({ data, boardId }: ListContainerProps) => {
   const [orderedData, setOrderedData] = useState(data);
 
   const { execute: executeUpdateListOrder } = useAction(updateListOrder, {
-    onSucces: () => {
+    onSuccess: () => {
       toast.success("List reordered");
+    },
+    onError: (error) => {
+      toast.error(error);
+    },
+  });
+
+  const { execute: executeUpdateCardOrder } = useAction(updateCardOrder, {
+    onSuccess: () => {
+      toast.success("Card reordered");
     },
     onError: (error) => {
       toast.error(error);
@@ -82,18 +91,17 @@ export const ListContainer = ({ data, boardId }: ListContainerProps) => {
         return;
       }
 
-      // Ckeck if cards exists on the sourceList
+      // Check if cards exists on the sourceList
       if (!sourceList.cards) {
         sourceList.cards = [];
       }
 
-      // Check id cards exists on the destList
+      // Check if cards exists on the destList
       if (!destList.cards) {
         destList.cards = [];
       }
 
       // Moving the card in the same list
-
       if (source.droppableId === destination.droppableId) {
         const reorderedCards = reorder(
           sourceList.cards,
@@ -108,14 +116,17 @@ export const ListContainer = ({ data, boardId }: ListContainerProps) => {
         sourceList.cards = reorderedCards;
 
         setOrderedData(newOrderedData);
-        // TODO: Trigger Server Action
+        executeUpdateCardOrder({
+          boardId: boardId,
+          items: reorderedCards,
+        });
         // User moves the card to another list
       } else {
         // Remove card from the source list
         const [movedCard] = sourceList.cards.splice(source.index, 1);
 
         // Assign the new listId to the moved card
-        movedCard.listId = destination.droppedId;
+        movedCard.listId = destination.droppableId;
 
         // Add card to the destination list
         destList.cards.splice(destination.index, 0, movedCard);
@@ -130,7 +141,10 @@ export const ListContainer = ({ data, boardId }: ListContainerProps) => {
         });
 
         setOrderedData(newOrderedData);
-        // TODO: Trigger Server Action
+        executeUpdateCardOrder({
+          boardId: boardId,
+          items: destList.cards,
+        });
       }
     }
   };

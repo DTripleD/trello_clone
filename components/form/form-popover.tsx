@@ -36,7 +36,7 @@ export const FormPopover = ({
   const closeRef = useRef<ElementRef<"button">>(null);
 
   const { execute, fieldErrors } = useAction(createBoard, {
-    onSucces: (data) => {
+    onSuccess: (data) => {
       toast.success("Board created!");
       closeRef.current?.click();
       router.push(`/board/${data.id}`);

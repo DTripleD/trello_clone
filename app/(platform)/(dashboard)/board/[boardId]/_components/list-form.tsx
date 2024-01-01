@@ -35,7 +35,7 @@ export const ListForm = () => {
   };
 
   const { execute, fieldErrors } = useAction(createList, {
-    onSucces: (data) => {
+    onSuccess: (data) => {
       toast.success(`List "${data.title}" created`);
       disableEditing();
       router.refresh();
